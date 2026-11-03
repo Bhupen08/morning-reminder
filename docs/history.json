@@ -1,1 +1,100 @@
-[]
+[
+ {
+  "date": "2026-11-03",
+  "time": "09:24",
+  "sections": [
+   {
+    "heading": "🛡️ CYBERSECURITY",
+    "items": [
+     {
+      "text": "3AM Affiliate Embraces AI-Like Loops in European School Attack",
+      "link": "https://www.darkreading.com/data-privacy/3am-affiliate-ai-loops-european-school-attack"
+     },
+     {
+      "text": "Russia dismantles infrastructure of VasyGrek cybercrime group, detains three suspects",
+      "link": "https://therecord.media/russia-dismantles-vasygrek-infrastructure-detains-three"
+     },
+     {
+      "text": "Russia-linked cyber spies target Ukraine's war crimes investigations, military aid routes",
+      "link": "https://therecord.media/russia-linked-cyber-spies-target-ukraine-war-support"
+     },
+     {
+      "text": "Red Hat Patches 9.8-Rated Linux TCP RCE Flaw While Ubuntu Releases Fixes for Testing",
+      "link": "https://thehackernews.com/2026/11/red-hat-patches-98-rated-linux-tcp-rce.html"
+     }
+    ]
+   },
+   {
+    "heading": "📈 BIGGEST GAINERS (last session)",
+    "items": [
+     {
+      "text": "IDXX +21.8% ($671.64) IDEXX Laboratories, Inc.",
+      "change": 21.85
+     },
+     {
+      "text": "NWL +15.1% ($5.96) Newell Brands Inc.",
+      "change": 15.06
+     },
+     {
+      "text": "NXT +14.9% ($91.13) Nextpower Inc.",
+      "change": 14.87
+     }
+    ]
+   },
+   {
+    "heading": "📉 BIGGEST DROPPERS (last session)",
+    "items": [
+     {
+      "text": "LITE -18.6% ($684.40) Lumentum Holdings Inc.",
+      "change": -18.59
+     },
+     {
+      "text": "TWST -15.5% ($129.04) Twist Bioscience Corporation",
+      "change": -15.54
+     },
+     {
+      "text": "SUPN -13.5% ($36.28) Supernus Pharmaceuticals, Inc.",
+      "change": -13.45
+     }
+    ]
+   },
+   {
+    "heading": "👀 MY WATCHLIST",
+    "items": [
+     {
+      "text": "S&P 500 7,541.40 (-0.5%)",
+      "change": -0.51
+     },
+     {
+      "text": "Nasdaq 25,164.31 (-1.1%)",
+      "change": -1.07
+     },
+     {
+      "text": "SPY 752.10 (-0.5%)",
+      "change": -0.48
+     },
+     {
+      "text": "NVDA 202.06 (-1.3%)",
+      "change": -1.26
+     },
+     {
+      "text": "AAPL 338.32 (-1.8%)",
+      "change": -1.83
+     },
+     {
+      "text": "TSLA 403.82 (+1.0%)",
+      "change": 1.0
+     }
+    ]
+   },
+   {
+    "heading": "💪 TRAINING TIP",
+    "items": [
+     {
+      "text": "Drink water early: a big glass now, and aim for pale-yellow urine all day."
+     }
+    ]
+   }
+  ]
+ }
+]
