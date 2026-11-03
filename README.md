@@ -8,8 +8,13 @@ How it works: GitHub runs `morning.py` for free on its own computers (so your
 Mac can be off), and the script sends the message through **ntfy**, a free
 push-notification app.
 
-Your private channel name (the "topic") is: `morning-fe74e9680435`
-Anyone who knows it can read or send to it, so keep it to yourself.
+Tap the notification to open the **briefing page**
+(https://bhupen08.github.io/morning-reminder/): today's briefing in color at the
+top, the last 14 days faded below.
+
+Your private ntfy channel name is stored only as the GitHub secret `NTFY_TOPIC`
+(it's not in these files, because this repo is public). Anyone who knows it
+can read or send to it, so keep it to yourself.
 
 ---
 
@@ -17,7 +22,7 @@ Anyone who knows it can read or send to it, so keep it to yourself.
 
 ### 1. Phone (2 min)
 1. Install **ntfy** from the App Store (free, by Philipp Heckel).
-2. Open it, allow notifications, tap **+**, type `morning-fe74e9680435`, tap **Subscribe**.
+2. Open it, allow notifications, tap **+**, type your channel name, tap **Subscribe**.
 
 ### 2. GitHub (5 min)
 1. Go to https://github.com/new. Name: `morning-briefing`. Choose **Private**. Click **Create repository**.
@@ -27,7 +32,7 @@ Anyone who knows it can read or send to it, so keep it to yourself.
    `.github/workflows/morning.yml` (the slashes create folders). Paste in the
    contents of `.github/workflows/morning.yml` from this folder. Click **Commit changes**.
 4. Go to **Settings → Secrets and variables → Actions → New repository secret**.
-   Name: `NTFY_TOPIC`. Secret: `morning-fe74e9680435`. Click **Add secret**.
+   Name: `NTFY_TOPIC`. Secret: your channel name. Click **Add secret**.
 5. Test it: **Actions** tab → **Morning briefing** → **Run workflow** → **Run workflow**.
    Within a minute or two your phone should buzz.
 
@@ -57,6 +62,8 @@ All edits are done on github.com: open the file, click the pencil ✏️, edit, 
 
 **More/fewer headlines or movers:** change `"cyber_news_count"` or `"movers_count"`.
 
+**Days kept on the page:** change `"history_days"` in `config.json`.
+
 **Training tips:** edit the `TRAINING_TIPS` list near the top of `morning.py`.
 
 **Pause it:** Actions tab → Morning briefing → `...` menu → **Disable workflow**.
@@ -74,5 +81,5 @@ All edits are done on github.com: open the file, click the pencil ✏️, edit, 
 In Terminal, from this folder:
 ```bash
 python3 morning.py --dry-run
-NTFY_TOPIC=morning-fe74e9680435 python3 morning.py
+NTFY_TOPIC=your-channel-name python3 morning.py
 ```

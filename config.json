@@ -4,10 +4,19 @@
   "title": "Good morning! Your daily briefing",
   "cyber_news_count": 4,
   "movers_count": 3,
-  "watchlist": ["^GSPC", "^IXIC", "SPY", "NVDA", "AAPL", "TSLA"],
+  "watchlist": [
+    "^GSPC",
+    "^IXIC",
+    "SPY",
+    "NVDA",
+    "AAPL",
+    "TSLA"
+  ],
   "cyber_feeds": [
     "https://feeds.feedburner.com/TheHackersNews",
     "https://therecord.media/feed",
     "https://www.darkreading.com/rss.xml"
-  ]
+  ],
+  "page_url": "https://bhupen08.github.io/morning-reminder/",
+  "history_days": 14
 }

@@ -85,7 +85,7 @@ def cyber_news(cfg):
         if title.lower() in seen:
             continue
         seen.add(title.lower())
-        out.append(f"- {title}\n  {link}")
+        out.append({"text": title, "link": link})
         if len(out) >= cfg["cyber_news_count"]:
             break
     return out
@@ -95,8 +95,9 @@ def movers(screen, count):
     url = ("https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?"
            + urllib.parse.urlencode({"scrIds": screen, "count": count}))
     quotes = json.loads(fetch(url))["finance"]["result"][0]["quotes"]
-    return [f"{q['symbol']} {q['regularMarketChangePercent']:+.1f}% "
-            f"(${q['regularMarketPrice']:.2f}) {q.get('shortName', '')}"
+    return [{"text": f"{q['symbol']} {q['regularMarketChangePercent']:+.1f}% "
+                     f"(${q['regularMarketPrice']:.2f}) {q.get('shortName', '')}",
+             "change": round(q["regularMarketChangePercent"], 2)}
             for q in quotes[:count]]
 
 
@@ -110,37 +111,64 @@ def watchlist(symbols):
             closes = [c for c in res["indicators"]["quote"][0]["close"] if c is not None]
             last, prev = closes[-1], closes[-2]
             name = {"^GSPC": "S&P 500", "^IXIC": "Nasdaq", "^DJI": "Dow"}.get(sym, sym)
-            out.append(f"{name} {last:,.2f} ({(last / prev - 1) * 100:+.1f}%)")
+            pct = (last / prev - 1) * 100
+            out.append({"text": f"{name} {last:,.2f} ({pct:+.1f}%)", "change": round(pct, 2)})
         except Exception as e:
             print(f"[warn] watchlist {sym}: {e}", file=sys.stderr)
     return out
 
 
-def section(title, build):
+def section(heading, build):
     try:
-        lines = build()
+        items = build()
     except Exception as e:
-        print(f"[warn] {title}: {e}", file=sys.stderr)
-        lines = []
-    return f"{title}\n" + ("\n".join(lines) if lines else "(couldn't load today)")
+        print(f"[warn] {heading}: {e}", file=sys.stderr)
+        items = []
+    return {"heading": heading, "items": items}
 
 
-def build_message(cfg, now):
+def build_briefing(cfg, now):
     tip = TRAINING_TIPS[now.timetuple().tm_yday % len(TRAINING_TIPS)]
-    parts = [
+    return [
         section("🛡️ CYBERSECURITY", lambda: cyber_news(cfg)),
         section("📈 BIGGEST GAINERS (last session)",
                 lambda: movers("day_gainers", cfg["movers_count"])),
         section("📉 BIGGEST DROPPERS (last session)",
                 lambda: movers("day_losers", cfg["movers_count"])),
         section("👀 MY WATCHLIST", lambda: watchlist(cfg["watchlist"])),
-        f"💪 TRAINING TIP\n{tip}",
+        {"heading": "💪 TRAINING TIP", "items": [{"text": tip}]},
     ]
+
+
+def render_text(sections):
+    parts = []
+    for sec in sections:
+        lines = []
+        for it in sec["items"]:
+            if "change" in it:
+                dot = "🟢" if it["change"] > 0 else "🔴" if it["change"] < 0 else "⚪"
+                lines.append(f"{dot} {it['text']}")
+            elif "link" in it:
+                lines.append(f"🔹 {it['text']}\n   {it['link']}")
+            else:
+                lines.append(it["text"])
+        parts.append(sec["heading"] + "\n" + ("\n".join(lines) or "(couldn't load today)"))
     msg = "\n\n".join(parts)
     # ntfy turns messages over 4096 bytes into attachments; keep it inline.
     while len(msg.encode()) > 4000:
         msg = msg[:-200]
     return msg
+
+
+def save_history(cfg, now, sections):
+    """Add today's briefing to docs/history.json, which the web page reads."""
+    path = HERE / "docs" / "history.json"
+    history = json.loads(path.read_text()) if path.exists() else []
+    history = [h for h in history if h["date"] != now.strftime("%Y-%m-%d")]
+    history.insert(0, {"date": now.strftime("%Y-%m-%d"), "time": now.strftime("%H:%M"),
+                       "sections": sections})
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(json.dumps(history[:cfg["history_days"]], ensure_ascii=False, indent=1))
 
 
 def is_send_time(cfg, now):
@@ -151,11 +179,13 @@ def is_send_time(cfg, now):
     return target <= now < target + timedelta(hours=1)
 
 
-def send(topic, title, msg):
+def send(topic, title, msg, page_url):
+    headers = {"Title": title.encode().decode("latin-1", "ignore"),
+               "Priority": "high", "Tags": "sunrise"}
+    if page_url:
+        headers["Click"] = page_url  # tapping the notification opens the page
     req = urllib.request.Request(
-        f"https://ntfy.sh/{topic}", data=msg.encode(), method="POST",
-        headers={"Title": title.encode().decode("latin-1", "ignore"),
-                 "Priority": "high", "Tags": "sunrise"})
+        f"https://ntfy.sh/{topic}", data=msg.encode(), method="POST", headers=headers)
     with urllib.request.urlopen(req, timeout=20) as r:
         print(f"sent: HTTP {r.status}")
 
@@ -166,14 +196,16 @@ def main():
     if "--scheduled" in sys.argv and not is_send_time(cfg, now):
         print(f"Not send time yet ({now:%H:%M} {cfg['timezone']}); skipping.")
         return
-    msg = build_message(cfg, now)
+    sections = build_briefing(cfg, now)
+    msg = render_text(sections)
     print(msg)
     if "--dry-run" in sys.argv:
         return
     topic = os.environ.get("NTFY_TOPIC")
     if not topic:
         sys.exit("NTFY_TOPIC is not set")
-    send(topic, cfg["title"], msg)
+    save_history(cfg, now, sections)
+    send(topic, cfg["title"], msg, cfg.get("page_url"))
 
 
 if __name__ == "__main__":
