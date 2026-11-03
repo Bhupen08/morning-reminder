@@ -1,0 +1,23 @@
+name: Morning briefing
+
+on:
+  schedule:
+    # Times here are UTC. Two runs cover US daylight saving time;
+    # morning.py only sends on the one that matches send_time in config.json.
+    # 8:30 AM New York = 12:30 UTC (summer) and 13:30 UTC (winter).
+    - cron: "30 12,13 * * *"
+  workflow_dispatch: # adds a "Run workflow" button for sending a test
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Send briefing
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        # Manual runs send right away; scheduled runs check the time first.
+        run: python morning.py ${{ github.event_name == 'schedule' && '--scheduled' || '' }}
